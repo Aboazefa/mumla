@@ -18,10 +18,14 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Set up Android SDK & NDK
+      - name: Set up Android SDK
         uses: android-actions/setup-android@v3
-        with:
-          ndk: '25.2.9519653'
+
+      - name: Install Android NDK 25.2.9519653
+        run: |
+          yes | sdkmanager --licenses > /dev/null
+          sdkmanager "ndk;25.2.9519653"
+          echo "$ANDROID_HOME/ndk/25.2.9519653" >> $GITHUB_PATH
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
