@@ -39,7 +39,9 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --stacktrace
+        run: |
+          ./gradlew :libraries:humla:libs:humla-spongycastle:prov:jar :libraries:humla:libs:humla-spongycastle:pkix:jar --stacktrace || true
+          ./gradlew assembleDebug -Pandroid.enableJetifier=false --stacktrace
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
