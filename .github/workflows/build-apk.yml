@@ -38,20 +38,12 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build Debug APK
+      - name: Download SpongyCastle JARs and Build Debug APK
         run: |
           SP_DIR="libraries/humla/libs/humla-spongycastle"
-          for mod in prov pkix; do
-            OUT_JAR="$SP_DIR/$mod/build/libs/$mod-1.51.0.0.jar"
-            mkdir -p "$(dirname "$OUT_JAR")" "/tmp/sp_build/$mod/classes"
-            if [ ! -f "$OUT_JAR" ]; then
-              SRCS=$(find "$SP_DIR/$mod/src" "$SP_DIR/core/src" -name "*.java" 2>/dev/null || true)
-              if [ -n "$SRCS" ]; then
-                javac -source 1.8 -target 1.8 -Xlint:-options -d "/tmp/sp_build/$mod/classes" $SRCS || true
-              fi
-              jar cf "$OUT_JAR" -C "/tmp/sp_build/$mod/classes" .
-            fi
-          done
+          mkdir -p "$SP_DIR/prov/build/libs" "$SP_DIR/pkix/build/libs"
+          curl -fSL "https://repo1.maven.org/maven2/com/madgag/spongycastle/prov/1.51.0.0/prov-1.51.0.0.jar" -o "$SP_DIR/prov/build/libs/prov-1.51.0.0.jar"
+          curl -fSL "https://repo1.maven.org/maven2/com/madgag/spongycastle/pkix/1.51.0.0/pkix-1.51.0.0.jar" -o "$SP_DIR/pkix/build/libs/pkix-1.51.0.0.jar"
           ./gradlew assembleDebug -Pandroid.enableJetifier=false --stacktrace
 
       - name: Upload APK artifact
