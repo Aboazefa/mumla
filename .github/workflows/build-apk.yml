@@ -40,13 +40,10 @@ jobs:
 
       - name: Build Debug APK
         run: |
-          ls -la libraries/humla/libs/humla-spongycastle || true
-          if [ -f "libraries/humla/libs/humla-spongycastle/gradlew" ]; then
-            chmod +x libraries/humla/libs/humla-spongycastle/gradlew
-            (cd libraries/humla/libs/humla-spongycastle && ./gradlew jar --stacktrace || ./gradlew build --stacktrace || true)
-          elif [ -f "libraries/humla/libs/humla-spongycastle/build.gradle" ]; then
-            gradle -p libraries/humla/libs/humla-spongycastle jar --stacktrace || gradle -p libraries/humla/libs/humla-spongycastle build --stacktrace || true
+          if [ -f "libraries/humla/libs/humla-spongycastle/build.xml" ]; then
+            (cd libraries/humla/libs/humla-spongycastle && ant jar || ant || true)
           fi
+          find libraries/humla/libs/humla-spongycastle -maxdepth 4 || true
           ./gradlew assembleDebug -Pandroid.enableJetifier=false --stacktrace
 
       - name: Upload APK artifact
