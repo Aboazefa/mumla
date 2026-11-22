@@ -40,10 +40,18 @@ jobs:
 
       - name: Build Debug APK
         run: |
-          if [ -f "libraries/humla/libs/humla-spongycastle/build.xml" ]; then
-            (cd libraries/humla/libs/humla-spongycastle && ant jar || ant || true)
-          fi
-          find libraries/humla/libs/humla-spongycastle -maxdepth 4 || true
+          SP_DIR="libraries/humla/libs/humla-spongycastle"
+          for mod in prov pkix; do
+            OUT_JAR="$SP_DIR/$mod/build/libs/$mod-1.51.0.0.jar"
+            mkdir -p "$(dirname "$OUT_JAR")" "/tmp/sp_build/$mod/classes"
+            if [ ! -f "$OUT_JAR" ]; then
+              SRCS=$(find "$SP_DIR/$mod/src" "$SP_DIR/core/src" -name "*.java" 2>/dev/null || true)
+              if [ -n "$SRCS" ]; then
+                javac -source 1.8 -target 1.8 -Xlint:-options -d "/tmp/sp_build/$mod/classes" $SRCS || true
+              fi
+              jar cf "$OUT_JAR" -C "/tmp/sp_build/$mod/classes" .
+            fi
+          done
           ./gradlew assembleDebug -Pandroid.enableJetifier=false --stacktrace
 
       - name: Upload APK artifact
