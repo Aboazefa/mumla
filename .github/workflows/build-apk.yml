@@ -41,14 +41,15 @@ jobs:
 
       - name: Download SpongyCastle JARs and Build Debug APK
         run: |
-          JAVA17_HOME="${{ steps.setup-java.outputs.path }}"
-          export JAVA_HOME="$JAVA17_HOME"
+          export JAVA_HOME="${{ steps.setup-java.outputs.path }}"
           export PATH="$JAVA_HOME/bin:$PATH"
+          java -version
+          ./gradlew --stop || true
           SP_DIR="libraries/humla/libs/humla-spongycastle"
           mkdir -p "$SP_DIR/prov/build/libs" "$SP_DIR/pkix/build/libs"
           curl -fSL "https://repo1.maven.org/maven2/com/madgag/spongycastle/prov/1.51.0.0/prov-1.51.0.0.jar" -o "$SP_DIR/prov/build/libs/prov-1.51.0.0.jar"
           curl -fSL "https://repo1.maven.org/maven2/com/madgag/spongycastle/pkix/1.51.0.0/pkix-1.51.0.0.jar" -o "$SP_DIR/pkix/build/libs/pkix-1.51.0.0.jar"
-          ./gradlew assembleDebug -Dorg.gradle.java.home="$JAVA_HOME" -Pandroid.enableJetifier=false --stacktrace
+          ./gradlew assembleDebug --no-daemon -Dorg.gradle.java.home="$JAVA_HOME" -Pandroid.enableJetifier=false --stacktrace
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
